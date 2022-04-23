@@ -14,6 +14,8 @@ win.title('Weather')
 
 g = geocoder.ip('me')
 myLocation = g.city     # lấy tên thành phố
+# print(g.latlng)
+
 
 def theWeatherNow():
     data = resultOfSearch(myLocation)
@@ -31,23 +33,30 @@ def show_weather_here():
 def resultOfSearch(location):
     x = requests.get(f'https://api.openweathermap.org/data/2.5/weather?q={location}&appid=a7c7bb6f3e9b61aee6966b09d3e30214')
     data = json.loads(x.text)
+    # print(data)
     return data
 
 
 def weatherOfCity(city):
     data = resultOfSearch(city)
-    temp = data['main']['temp']
-    humid = data['main']['humidity']
     for widgets in frame4.winfo_children():
         widgets.destroy()
-    lb1 = Label(frame4,text=f'Thành phố {city} ', font="Time 12 bold")
-    lb2 = Label(frame4,text=f'Nhiệt độ {temp} độ K', font="Time 12")
-    lb3 = Label(frame4,text=f'Độ ẩm {humid}%', font="Time 12")
-    lb1.pack()
-    lb2.pack()
-    lb3.pack()
+    if(data['cod'] == '404'): 
+        lb1 = Label(frame4,text="Vui lòng nhập đúng tên tỉnh thành phố.")
+        lb1.pack()
+    else:  
+        temp = data['main']['temp']
+        humid = data['main']['humidity']
+        lb1 = Label(frame4,text=f'Thành phố {city} ', font="Time 12 bold")
+        lb2 = Label(frame4,text=f'Nhiệt độ {temp} độ K', font="Time 12")
+        lb3 = Label(frame4,text=f'Độ ẩm {humid}%', font="Time 12")
+        lb1.pack()
+        lb2.pack()
+        lb3.pack()
     
 def closeSearchFunction():
+    for widgets in frame4.winfo_children():
+        widgets.destroy()
     frame3.pack_forget()
     frame4.pack_forget()
 
