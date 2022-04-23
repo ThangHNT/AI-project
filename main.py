@@ -7,6 +7,7 @@ from geopy.geocoders import Nominatim
 import geocoder
 from tkinter import *
 import threading
+from PIL import ImageTk, Image
 
 win = Tk()
 win.title('Weather')
@@ -39,9 +40,9 @@ def weatherOfCity(city):
     humid = data['main']['humidity']
     for widgets in frame4.winfo_children():
         widgets.destroy()
-    lb1 = Label(frame4,text=f'Thành phố {city}', font="Time 12 bold")
-    lb2 = Label(frame4,text=f'Nhiệt độ {temp}', font="Time 12")
-    lb3 = Label(frame4,text=f'Độ ẩm {humid}', font="Time 12")
+    lb1 = Label(frame4,text=f'Thành phố {city} ', font="Time 12 bold")
+    lb2 = Label(frame4,text=f'Nhiệt độ {temp} độ K', font="Time 12")
+    lb3 = Label(frame4,text=f'Độ ẩm {humid}%', font="Time 12")
     lb1.pack()
     lb2.pack()
     lb3.pack()
@@ -74,6 +75,8 @@ frame1 = Frame(win)
 frame2 = Frame(win)
 frame3 = Frame(win)
 frame4 = Frame(win)
+frame5 = Frame(win)
+frame5.place(anchor='center', relx=0.5, rely=0.5)
 lb1 = Label(frame1, text="Chọn chức năng", font="Times 14 bold")
 lb2 = Label(frame2, text="Xem thời tiết chỗ bạn", font="Times 14")
 lb3 = Label(frame2, text="Xem thời tiết tỉnh thành khác", font="Times 14")
@@ -88,10 +91,18 @@ lb4.grid(row=2, column=0,sticky=W)
 btn1.grid(row=0, column=1)
 btn2.grid(row=1, column=1)
 btn3.grid(row=2, column=1)
+frame5.pack()
 frame1.pack()
 frame2.pack()
 frame3.pack()
 frame4.pack()
+
+# thêm hình ảnh
+imgae = Image.open('images/weather.jpg')
+resizeImg = imgae.resize((300,120))
+img = ImageTk.PhotoImage(resizeImg)
+lb5 = Label(frame5,image=img)
+lb5.pack()
 
 # -------------------------------------------------------------------------------------------------------------------
 
