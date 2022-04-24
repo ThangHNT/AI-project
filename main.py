@@ -14,18 +14,15 @@ win.title('Weather')
 
 g = geocoder.ip('me')
 myLocation = g.city     # lấy tên thành phố
-# print(g.latlng)
 
 
 def theWeatherNow():
     data = resultOfSearch(myLocation)
     text = f'main: {data["main"]} \n'
-    # print(data['main']["humidity"])
-    # while True:
-    #     t = ToastNotifier()
-    #     t.show_toast(f"Weather of {myLocation} today:",text,duration = 5)
-    #     # print('ok')
-    #     break
+    while True:
+        t = ToastNotifier()
+        t.show_toast(f"Weather of {myLocation} today:",text,duration = 5)
+        break
 def show_weather_here():
     show_weather = threading.Thread(target = theWeatherNow)
     show_weather.start()
