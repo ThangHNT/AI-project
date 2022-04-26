@@ -15,10 +15,19 @@ win.title('Weather')
 g = geocoder.ip('me')
 myLocation = g.city     # lấy tên thành phố
 
+# loc = Nominatim(user_agent="GetLoc")
+# myLocation = loc.geocode("Hà Nội")
+# print((myLocation.address))
 
 def theWeatherNow():
     data = resultOfSearch(myLocation)
-    text = f'main: {data["main"]} \n'
+    temp = data['main']['temp']
+    temp -= 273.15
+    humid = data['main']['humidity']
+    status = data['weather'][0]['description']
+    visibility = data['visibility']
+    windSpeed = data['wind']['speed']
+    text = f'Nhiệt độ: {temp} độ C \n Độ ẩm: {humid}% \n Tầm nhìn xa: {visibility}m \n Tốc độ gió: {windSpeed}m/s'
     while True:
         t = ToastNotifier()
         t.show_toast(f"Weather of {myLocation} today:",text,duration = 5)
@@ -43,13 +52,21 @@ def weatherOfCity(city):
         lb1.pack()
     else:  
         temp = data['main']['temp']
+        temp -= 273.15
         humid = data['main']['humidity']
+        status = data['weather'][0]['description']
+        visibility = data['visibility']
+        windSpeed = data['wind']['speed']
         lb1 = Label(frame4,text=f'Thành phố {city} ', font="Time 12 bold")
-        lb2 = Label(frame4,text=f'Nhiệt độ {temp} độ K', font="Time 12")
-        lb3 = Label(frame4,text=f'Độ ẩm {humid}%', font="Time 12")
+        lb3 = Label(frame4,text=f'Nhiệt độ {"%.2f"%temp} độ C', font="Time 12")
+        lb4 = Label(frame4,text=f'Độ ẩm {humid}%', font="Time 12")
+        lb5 = Label(frame4,text=f'Tầm nhìn xa {visibility}m/s', font="Time 12")
+        lb6 = Label(frame4,text=f'Tốc độ gió{windSpeed}m/s', font="Time 12")
         lb1.pack()
-        lb2.pack()
         lb3.pack()
+        lb4.pack()
+        lb5.pack()
+        lb6.pack()
     
 def closeSearchFunction():
     for widgets in frame4.winfo_children():
@@ -86,17 +103,13 @@ frame5.place(anchor='center', relx=0.5, rely=0.5)
 lb1 = Label(frame1, text="Chọn chức năng", font="Times 14 bold")
 lb2 = Label(frame2, text="Xem thời tiết chỗ bạn", font="Times 14")
 lb3 = Label(frame2, text="Xem thời tiết tỉnh thành khác", font="Times 14")
-lb4 = Label(frame2, text="Tỉnh thành phố có thời tiết đẹp", font="Times 14")
 btn1 = Button(frame2, text="Chọn", command=show_weather_here)
 btn2 = Button(frame2, text="Nhập", command=searchFunction)
-btn3 = Button(frame2, text="Chọn")
 lb1.pack()
 lb2.grid(row=0, column=0,sticky=W)
 lb3.grid(row=1, column=0,sticky=W)
-lb4.grid(row=2, column=0,sticky=W)
 btn1.grid(row=0, column=1)
 btn2.grid(row=1, column=1)
-btn3.grid(row=2, column=1)
 frame5.pack()
 frame1.pack()
 frame2.pack()
@@ -111,15 +124,9 @@ lb5 = Label(frame5,image=img)
 lb5.pack()
 
 # -------------------------------------------------------------------------------------------------------------------
-
-
 # myclient = pymongo.MongoClient("mongodb://localhost:27017/")
 # mydb = myclient["AI"]
 # mycollection = mydb["cities"]
-
-
-
-
 
 show_weather_here()
 win.mainloop()

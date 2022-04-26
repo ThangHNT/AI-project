@@ -4,24 +4,14 @@ import speech_recognition as sr
 import time
 import sys
 import ctypes
-# import wikipedia
 import datetime
 import json
 import re
-# import webbrowser
-# import smtplib
 import requests
-# import urllib
-# import urllib.request as urllib2
-# from selenium import webdriver
-# from selenium.webdriver.common.keys import Keys
-# from webdriver_manager.chrome import ChromeDriverManager
 from time import strftime
 from gtts import gTTS
-# from youtube_search import YoutubeSearch
 
 language = 'vi'
-# path = ChromeDriverManager().install()
 
 def speak(text):
     print("Bot: {}".format(text))
@@ -35,7 +25,7 @@ def get_voice():
      r = sr.Recognizer()
      with sr.Microphone() as source:
         print("Me: ", end = '')
-        audio = r.listen(source, phrase_time_limit=5)
+        audio = r.record(source, duration=5)
         try:
             text = r.recognize_google(audio, language="vi-VN")
             print(text)
@@ -55,44 +45,25 @@ def get_text():
             return text.lower()
         elif i < 2:
             speak("Bot không nghe rõ, bạn có thể nói lại không ?")
-    time.sleep(10)
+    time.sleep(5)
     stop()
     return 0
 
-def talk(name):
-    day_time = int(strftime('%H'))
-    if day_time < 12:
-        speak("Chào buổi sáng {}. Chúc bạn ngày mới tốt lành!".format(name))
-    elif day_time < 18:
-        speak("Chào buổi chiều {}!".format(name))
-    else:
-        speak("Chào buổi tối {}!".format(name))
-    time.sleep(5)
-    speak("Bạn có khỏe không ?")
-    time.sleep(3)
-    ans = get_voice()
-    if ans:
-        if "có" in ans:
-            speak("Thật là tốt!")
-        else:
-            speak("Vậy à, bạn nên nghỉ ngơi đi!")
-
 def run():
-    speak("Xin chao ban")
+    speak("Xin chào bạn, hãy cho tôi biết tên của bạn")
     time.sleep(3)
     name = get_text()
     if name: 
-        speak("chao ban {}".format(name))
+        speak("Chào bạn {}".format(name))
         time.sleep(3)
-        speak("ban can giup gi ko")
+        speak("Bạn muốn xem thời tiết về tỉnh thành phố nào?")
         time.sleep(3)
         while True:
             text = get_text()
             if not text: break
-            elif  "trò chuyện" in text or "nói chuyện" in text:
-                talk(name)
             elif "dừng" in text or "thôi" in text: 
                 stop()
+                time.sleep(3)
                 break
 
 run()
