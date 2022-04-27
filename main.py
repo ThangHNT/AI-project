@@ -8,6 +8,7 @@ import geocoder
 from tkinter import *
 import threading
 from PIL import ImageTk, Image
+import botAI
 
 win = Tk()
 win.title('Weather')
@@ -129,5 +130,6 @@ lb5.pack()
 # mycollection = mydb["cities"]
 
 show_weather_here()
-win.mainloop()
+# win.mainloop()
+botAI.run()
 

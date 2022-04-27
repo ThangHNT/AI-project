@@ -1,6 +1,7 @@
 # import geocoder
 import requests
 import json
+import pymongo
 # g = geocoder.ip('me')
 # print(g.state)
 # print(g.json)
@@ -8,9 +9,9 @@ import json
 # x = requests.get('https://api.openweathermap.org/data/2.5/weather?q=thành phố nam định&appid=a7c7bb6f3e9b61aee6966b09d3e30214')
 # k = json.loads(x.text)
 # print(k['weather'][0]['main'] + k['weather'][0]['description'])
-x = requests.get('https://provinces.open-api.vn/api/?depth=3')
-k = json.loads(x.text)
-i = 0
+# x = requests.get('https://provinces.open-api.vn/api/?depth=3')
+# k = json.loads(x.text)
+# i = 0
 # print(type(k[i]['name']))
 
 # with open('cities.txt', 'a') as file_object:
@@ -57,3 +58,10 @@ i = 0
 # Label(win, text='hello').grid(row=0,column=1)
 
 # win.mainloop()
+
+myclient = pymongo.MongoClient("mongodb://localhost:27017/")
+mydb = myclient["AI"]
+mycollection = mydb["cities"]
+
+for city in mycollection.find():
+    print(city['name'])

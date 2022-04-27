@@ -65,5 +65,22 @@ def run():
                 stop()
                 time.sleep(3)
                 break
-
-run()
+            else :
+                x = requests.get(f'https://api.openweathermap.org/data/2.5/weather?q={text}&appid=a7c7bb6f3e9b61aee6966b09d3e30214')
+                data = json.loads(x.text)
+                if(data['cod'] == '404'): speak('Bạn hãy nói đúng tên tỉnh thành phố')
+                else :
+                    temp = data['main']['temp']
+                    temp -= 273.15
+                    humid = data['main']['humidity']
+                    visibility = data['visibility']
+                    windSpeed = data['wind']['speed']
+                    speak(f"{text}")
+                    time.sleep(3)
+                    speak(f'Nhiệt độ {"%.2f"%temp} độ C')
+                    time.sleep(3)
+                    speak(f'Độ ẩm {humid}%')
+                    time.sleep(3)
+                    speak(f'Tầm nhìn xa {visibility}m/s')
+                    time.sleep(3)
+                    speak(f'Tốc độ gió {windSpeed}m/s')
