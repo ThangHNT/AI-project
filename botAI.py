@@ -3,16 +3,35 @@ import playsound
 import speech_recognition as sr
 import time
 import sys
-import ctypes
-import datetime
 import json
-import re
 import requests
 from time import strftime
 from gtts import gTTS
+import threading
+from tkinter import *
+import main
+
+def showResults(data):
+    for widgets in main.frame4.winfo_children():
+        widgets.destroy()
+    temp = data['main']['temp']
+    temp -= 273.15
+    humid = data['main']['humidity']
+    city = data['name']
+    visibility = data['visibility']
+    windSpeed = data['wind']['speed']
+    lb1 = Label(main.frame4,text=f'Thành phố {city} ', font="Time 12 bold")
+    lb3 = Label(main.frame4,text=f'Nhiệt độ {"%.2f"%temp} độ C', font="Time 12")
+    lb4 = Label(main.frame4,text=f'Độ ẩm {humid}%', font="Time 12")
+    lb5 = Label(main.frame4,text=f'Tầm nhìn xa {visibility}m/s', font="Time 12")
+    lb6 = Label(main.frame4,text=f'Tốc độ gió {windSpeed}m/s', font="Time 12")
+    lb1.pack()
+    lb3.pack()
+    lb4.pack()
+    lb5.pack()
+    lb6.pack()
 
 language = 'vi'
-
 def speak(text):
     print("Bot: {}".format(text))
     #truyen vao text de doc len
@@ -51,11 +70,11 @@ def get_text():
 
 def run():
     speak("Xin chào bạn, hãy cho tôi biết tên của bạn")
-    time.sleep(3)
+    time.sleep(2)
     name = get_text()
     if name: 
         speak("Chào bạn {}".format(name))
-        time.sleep(3)
+        time.sleep(1)
         speak("Bạn muốn xem thời tiết về tỉnh thành phố nào?")
         time.sleep(3)
         while True:
@@ -70,6 +89,8 @@ def run():
                 data = json.loads(x.text)
                 if(data['cod'] == '404'): speak('Bạn hãy nói đúng tên tỉnh thành phố')
                 else :
+                    showResults(data)
+                    time.sleep(3)
                     temp = data['main']['temp']
                     temp -= 273.15
                     humid = data['main']['humidity']
@@ -84,3 +105,6 @@ def run():
                     speak(f'Tầm nhìn xa {visibility}m/s')
                     time.sleep(3)
                     speak(f'Tốc độ gió {windSpeed}m/s')
+                    time.sleep(3)
+                    stop()
+                    break

@@ -31,7 +31,7 @@ def theWeatherNow():
     text = f'Nhiệt độ: {temp} độ C \n Độ ẩm: {humid}% \n Tầm nhìn xa: {visibility}m \n Tốc độ gió: {windSpeed}m/s'
     while True:
         t = ToastNotifier()
-        t.show_toast(f"Weather of {myLocation} today:",text,duration = 5)
+        t.show_toast(f"Thời tiết của {myLocation} hôm nay:",text,duration = 5)
         break
 def show_weather_here():
     show_weather = threading.Thread(target = theWeatherNow)
@@ -62,7 +62,7 @@ def weatherOfCity(city):
         lb3 = Label(frame4,text=f'Nhiệt độ {"%.2f"%temp} độ C', font="Time 12")
         lb4 = Label(frame4,text=f'Độ ẩm {humid}%', font="Time 12")
         lb5 = Label(frame4,text=f'Tầm nhìn xa {visibility}m/s', font="Time 12")
-        lb6 = Label(frame4,text=f'Tốc độ gió{windSpeed}m/s', font="Time 12")
+        lb6 = Label(frame4,text=f'Tốc độ gió {windSpeed}m/s', font="Time 12")
         lb1.pack()
         lb3.pack()
         lb4.pack()
@@ -88,7 +88,8 @@ def searchFunction():
     frame3.pack()
     frame4.pack()
 
-
+def bot_run():
+    botAI.run()
 
 screenWidth = win.winfo_screenwidth()
 screenHeight = win.winfo_screenheight()
@@ -104,13 +105,17 @@ frame5.place(anchor='center', relx=0.5, rely=0.5)
 lb1 = Label(frame1, text="Chọn chức năng", font="Times 14 bold")
 lb2 = Label(frame2, text="Xem thời tiết chỗ bạn", font="Times 14")
 lb3 = Label(frame2, text="Xem thời tiết tỉnh thành khác", font="Times 14")
+lb4 = Label(frame2, text="Bot AI", font="Times 14")
 btn1 = Button(frame2, text="Chọn", command=show_weather_here)
 btn2 = Button(frame2, text="Nhập", command=searchFunction)
+btn3 = Button(frame2, text="Nhập", command=bot_run)
 lb1.pack()
 lb2.grid(row=0, column=0,sticky=W)
 lb3.grid(row=1, column=0,sticky=W)
+lb4.grid(row=2, column=0,sticky=W)
 btn1.grid(row=0, column=1)
 btn2.grid(row=1, column=1)
+btn3.grid(row=2,column=1)
 frame5.pack()
 frame1.pack()
 frame2.pack()
@@ -130,6 +135,6 @@ lb5.pack()
 # mycollection = mydb["cities"]
 
 show_weather_here()
-# win.mainloop()
-botAI.run()
+win.mainloop()
+
 
