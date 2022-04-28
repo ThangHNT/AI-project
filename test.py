@@ -2,6 +2,8 @@
 import requests
 import json
 import pymongo
+import webbrowser as wb
+import re
 # g = geocoder.ip('me')
 # print(g.state)
 # print(g.json)
@@ -59,9 +61,92 @@ import pymongo
 
 # win.mainloop()
 
-myclient = pymongo.MongoClient("mongodb://localhost:27017/")
-mydb = myclient["AI"]
-mycollection = mydb["cities"]
+# myclient = pymongo.MongoClient("mongodb://localhost:27017/")
+# mydb = myclient["AI"]
+# mycollection = mydb["cities"]
+# for city in mycollection.find():
+#     cityName = city["name"].lower()
+#     with open('cities.txt', 'a',encoding='UTF-8') as file_object:
+#         file_object.write(f'{cityName}\n')
 
-for city in mycollection.find():
-    print(city['name'])
+
+# url = 'https://google.com/search?q=thoi tiet ha noi'
+# wb.get().open(url)
+
+
+# x = input('xau can tim: ')
+# y = input('xau mau: ')
+
+def preKMP(x):
+    kmpNext = [0]*(len(x) +1)
+    i = 0
+    j = -1
+    kmpNext[0] = -1
+    while(i < len(x) -1):
+        while j > -1 and x[i] != x[j]:
+            j = kmpNext[j]
+        i +=1 
+        j += 1
+        if x[i] == x[j]:
+            kmpNext[i] = kmpNext[j]
+        else: kmpNext[i] = j
+    return kmpNext
+    
+def search(x,y,listCity):
+    kmpNext = preKMP(x)
+    i = 0
+    m = 0
+    while m <= len(y) - len(x):
+        if x[i] == y[m+i]:
+            i += 1
+            if i == len(x):
+                listCity.append(x)
+                m += i - kmpNext[i]
+                i = kmpNext[i]
+        else:
+            m += i - kmpNext[i]
+            i = 0
+    return 0
+
+
+
+# y = input('xau mau: ')
+def getCity(y):
+    listCity = []
+    with open('cities.txt','r', encoding ='UTF-8') as file_object:
+        ds = file_object.readlines()
+    for city in ds:
+        city = city.replace('\n','')
+        search(city,y,listCity)
+    if len(listCity) > 0: return listCity[0]
+    return ''
+# getCity(y)
+
+from bs4 import BeautifulSoup
+import urllib.request
+url =  'https://thoitiet.vn/nam-dinh' 
+page = urllib.request.urlopen(url)
+soup = BeautifulSoup(page, 'html.parser')
+weatherDaily = soup.find_all('div', attrs = {'class': 'carousel-inner row w-100 mx-auto'})
+eachDay = weatherDaily[1].find_all('div', {'class':'location-wheather'})
+amountOfRain = eachDay[1].find('div',{'class':'precipitation'}).text.strip()
+status = eachDay[1].find('p',{'class':'mb-0'}).text.strip()
+tempMin = eachDay[1].find('p',{'title':'Thấp nhất'}).text.strip()
+tempMax = eachDay[1].find('p',{'title':'Cao nhất'}).text.strip()
+date = eachDay[1].find('span').text.strip()
+# print(date)
+
+# curTemp = soup.find('span',{'class': 'current-temperature'}).text.strip()
+# print(curTemp)
+# status = soup.find('p',{'class': 'overview-caption-item-detail'}).text.strip()
+# print(status)
+
+# weatherDetail = soup.find('div',{'class': 'd-flex flex-wrap justify-content-between weather-detail mt-2'})
+# ds = weatherDetail.find_all('div',{'class': 'd-flex ml-auto align-items-center'})
+# weatherDetailItem = ds[2].find('span',{'class': 'text-white op-8 fw-bold'}).text.strip()
+
+txt = 'thời tiết hà nội trong 7 ngày tới'
+x = re.findall("[0-9]", txt)
+print(x)
+
+

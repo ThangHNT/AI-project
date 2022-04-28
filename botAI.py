@@ -9,32 +9,19 @@ from time import strftime
 from gtts import gTTS
 import threading
 from tkinter import *
-import main
+# import main
+import unidecode
+import webbrowser as wb
+import datetime
+import string_comparison_algorithm as sca
+from bs4 import BeautifulSoup
+import urllib.request
+import re
 
-def showResults(data):
-    for widgets in main.frame4.winfo_children():
-        widgets.destroy()
-    temp = data['main']['temp']
-    temp -= 273.15
-    humid = data['main']['humidity']
-    city = data['name']
-    visibility = data['visibility']
-    windSpeed = data['wind']['speed']
-    lb1 = Label(main.frame4,text=f'Thành phố {city} ', font="Time 12 bold")
-    lb3 = Label(main.frame4,text=f'Nhiệt độ {"%.2f"%temp} độ C', font="Time 12")
-    lb4 = Label(main.frame4,text=f'Độ ẩm {humid}%', font="Time 12")
-    lb5 = Label(main.frame4,text=f'Tầm nhìn xa {visibility}m/s', font="Time 12")
-    lb6 = Label(main.frame4,text=f'Tốc độ gió {windSpeed}m/s', font="Time 12")
-    lb1.pack()
-    lb3.pack()
-    lb4.pack()
-    lb5.pack()
-    lb6.pack()
 
 language = 'vi'
 def speak(text):
     print("Bot: {}".format(text))
-    #truyen vao text de doc len
     tts = gTTS(text=text, lang=language, slow = False)
     tts.save("sound.mp3")
     playsound.playsound("sound.mp3", False)
@@ -54,8 +41,7 @@ def get_voice():
             return 0
 
 def stop():
-    speak("Hẹn gặp lại bạn nhé!")
-
+    speak("Chúc bạn 1 ngày tốt lành!")
 
 def get_text():
     for i in range(3):
@@ -64,47 +50,172 @@ def get_text():
             return text.lower()
         elif i < 2:
             speak("Bot không nghe rõ, bạn có thể nói lại không ?")
-    time.sleep(5)
+    time.sleep(3)
     stop()
     return 0
 
-def run():
-    speak("Xin chào bạn, hãy cho tôi biết tên của bạn")
+
+def getCity(y):
+    if 'thời tiết' not in y and 'nắng' not in y and 'mưa' not in y : return ''
+    else: 
+        listCity = []
+        with open('cities.txt','r', encoding ='UTF-8') as file_object:
+            ds = file_object.readlines()
+        for city in ds:
+            city = city.replace('\n','')
+            sca.search(city,y,listCity)
+        if len(listCity) > 0: return listCity[0]
+        return ''
+
+def remove_accent(text):
+    return unidecode.unidecode(text)
+
+def visitWebPage(location):
+    city = remove_accent(location).replace(' ','-')
+    url = f'https://thoitiet.vn/{city}'
+    page = urllib.request.urlopen(url)
+    soup = BeautifulSoup(page, 'html.parser')
+    return soup
+
+def getCurrentWeather(location):  # xem thời tiết hiện tại
+    soup = visitWebPage(location)
+    status = soup.find('p',{'class': 'overview-caption-item-detail'}).text.strip()
+    curTemp = soup.find('span',{'class': 'current-temperature'}).text.strip()
+    curTemp += 'C'
+    weatherDetail = soup.find('div',{'class': 'd-flex flex-wrap justify-content-between weather-detail mt-2'})
+    ds = weatherDetail.find_all('div',{'class': 'd-flex ml-auto align-items-center'})
+    tempRangeHtml = ds[0].find('span',{'class': 'text-white op-8 fw-bold'}).text.strip()
+    tempRange = tempRangeHtml.replace('/','-')
+    tempRange += 'C'
+    humid = ds[1].find('span',{'class': 'text-white op-8 fw-bold'}).text.strip()
+    visibility = ds[2].find('span',{'class': 'text-white op-8 fw-bold'}).text.strip()
+    UV_index = ds[5].find('span',{'class': 'text-white op-8 fw-bold'}).text.strip()
+    speak(f'{location} hiện tại {status}')
     time.sleep(2)
-    name = get_text()
-    if name: 
-        speak("Chào bạn {}".format(name))
-        time.sleep(1)
-        speak("Bạn muốn xem thời tiết về tỉnh thành phố nào?")
+    speak(f'Nhiệt độ hiện tại {curTemp}')
+    time.sleep(3)
+    speak(f'nhiệt độ trong ngày từ {tempRange}')
+    time.sleep(4)
+    speak(f'Độ ẩm {humid}')
+    time.sleep(3)
+    speak(f'Tầm nhìn xa {visibility}')
+    time.sleep(3)
+    speak(f'chỉ số tia UV {UV_index}')
+    time.sleep(3)
+
+def getWeatherOtherDay(location,count,text): # xem thời tiết vào 1 ngày nào đó
+    soup = visitWebPage(location)
+    weatherDaily = soup.find_all('div', attrs = {'class': 'carousel-inner row w-100 mx-auto'})
+    eachDay = weatherDaily[1].find_all('div', {'class':'location-wheather'})
+    status = eachDay[count].find('p',{'class':'mb-0'}).text.strip()
+    possibilityOfRain = eachDay[count].find('div',{'class':'precipitation'}).text.strip()
+    tempMin = eachDay[count].find('p',{'title':'Thấp nhất'}).text.strip()
+    tempMax = eachDay[count].find('p',{'title':'Cao nhất'}).text.strip()
+    speak(text)
+    time.sleep(3)
+    speak(f'{status}')
+    time.sleep(2)
+    speak(f'khả năng mưa {possibilityOfRain}')
+    time.sleep(3)
+    speak(f'nhiệt độ từ {tempMin} đến {tempMax}')
+    time.sleep(4)
+
+def checkRainOrSunny(location,number,type): # kiểm tra trog n ngày tới có mưa/nắng không
+    soup = visitWebPage(location)
+    rain = []
+    sunny = []
+    number = int(number)
+    weatherDaily = soup.find_all('div', attrs = {'class': 'carousel-inner row w-100 mx-auto'})
+    eachDay = weatherDaily[1].find_all('div', {'class':'location-wheather'})
+    if number == 1:
+        status = eachDay[1].find('p',{'class':'mb-0'}).text.strip().lower()
+        if 'mưa' in status : speak('ngày mai có mưa')
+        else : speak('ngày mai có nắng')
         time.sleep(3)
-        while True:
-            text = get_text()
-            if not text: break
-            elif "dừng" in text or "thôi" in text: 
-                stop()
-                time.sleep(3)
-                break
-            else :
-                x = requests.get(f'https://api.openweathermap.org/data/2.5/weather?q={text}&appid=a7c7bb6f3e9b61aee6966b09d3e30214')
-                data = json.loads(x.text)
-                if(data['cod'] == '404'): speak('Bạn hãy nói đúng tên tỉnh thành phố')
-                else :
-                    showResults(data)
-                    time.sleep(3)
-                    temp = data['main']['temp']
-                    temp -= 273.15
-                    humid = data['main']['humidity']
-                    visibility = data['visibility']
-                    windSpeed = data['wind']['speed']
-                    speak(f"{text}")
-                    time.sleep(3)
-                    speak(f'Nhiệt độ {"%.2f"%temp} độ C')
-                    time.sleep(3)
-                    speak(f'Độ ẩm {humid}%')
-                    time.sleep(3)
-                    speak(f'Tầm nhìn xa {visibility}m/s')
-                    time.sleep(3)
-                    speak(f'Tốc độ gió {windSpeed}m/s')
-                    time.sleep(3)
-                    stop()
-                    break
+    if number == 2:
+        status = eachDay[2].find('p',{'class':'mb-0'}).text.strip().lower()
+        if 'mưa' in status : speak('ngày kia có mưa')
+        else : speak('ngày kia có nắng')
+        time.sleep(3)
+    else:
+        for i in range(1,number+1):
+            status = eachDay[i].find('p',{'class':'mb-0'}).text.strip().lower()
+            date = eachDay[i].find('span').text.strip()
+            date = date.replace('T', 'thứ ')
+            if 'CN' in date: date = date.replace('CN', 'chủ nhật')
+            if 'mưa' in status: rain.append(date)
+            else : sunny.append(date)
+        if (len(rain) == 0 and type == 'mưa'):
+            speak(f'trong {number} ngày tới không có {type}')
+            time.sleep(3)
+        elif (len(sunny) == 0 and type == 'nắng'):
+            speak(f'trong {number} ngày tới không có {type}')
+            time.sleep(3)
+        else:
+            speak(f'những ngày {type} trong {number} ngày tới')
+            time.sleep(3)
+            if type == 'mưa':
+                for k in rain:
+                    speak(k)
+                    time.sleep(2)
+            else: 
+                for k in sunny:
+                    speak(k)
+                    time.sleep(2)
+
+def weatherOfTheFollowingDay(location,number):
+    soup = visitWebPage(location)
+    weatherDaily = soup.find_all('div', attrs = {'class': 'carousel-inner row w-100 mx-auto'})
+    number = int(number)
+    speak(f'thời tiết trong {number} ngày tới')
+    time.sleep(3)
+    eachDay = weatherDaily[1].find_all('div', {'class':'location-wheather'})
+    for i in range(1,number+1):
+        date = eachDay[i].find('span').text.strip()
+        date = date.replace('T', 'thứ ')
+        if 'CN' in date: date = date.replace('CN', 'chủ nhật')
+        speak(date)
+        time.sleep(3)
+        status = eachDay[i].find('p',{'class':'mb-0'}).text.strip()
+        speak(status)
+        time.sleep(2)
+        
+
+def run():
+    while True:
+        speak('Tôi có thể giúp gì cho bạn')
+        time.sleep(2)
+        text = get_text()
+        city = getCity(text)
+        if not text: break
+        elif "dừng" in text or "thôi" in text or "kết thúc" in text or "thoát" in text: 
+            stop()
+            time.sleep(3)
+            break
+        elif(city == '') : 
+            speak('bạn hãy đưa ra câu hỏi về thời tiết')
+            time.sleep(2)
+        else : 
+            checkNumber = x = re.findall("[0-9]", text)
+            print(checkNumber)
+            if 'có mưa' in text and 'ngày mai' in text :
+                checkRainOrSunny(city,1,'mưa')
+            elif 'có mưa' in text and 'ngày kia' in text :
+                checkRainOrSunny(city,2,'mưa')
+            elif 'có nắng' in text and 'ngày mai' in text :
+                checkRainOrSunny(city,1,'nắng')
+            elif 'có nắng' in text and 'ngày kia' in text :
+                checkRainOrSunny(city,2,'nắng')
+            elif 'có mưa' in text and len(checkNumber) > 0 and 'ngày tới' in text:
+                checkRainOrSunny(city,checkNumber[0],'mưa')
+            elif 'có nắng' in text and len(checkNumber) > 0 and 'ngày tới' in text:
+                checkRainOrSunny(city,checkNumber[0],'nắng')
+            elif 'ngày tới' in text and len(checkNumber) > 0 :
+                weatherOfTheFollowingDay(city,checkNumber[0])
+            elif 'ngày mai' in text :
+                getWeatherOtherDay(city,1,text)
+            elif 'ngày kia' in text :
+                getWeatherOtherDay(city,2,text)
+            else: getCurrentWeather(city)
+        
+run()

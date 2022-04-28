@@ -9,12 +9,16 @@ from tkinter import *
 import threading
 from PIL import ImageTk, Image
 import botAI
+import webbrowser as wb
+import datetime
 
 win = Tk()
 win.title('Weather')
 
 g = geocoder.ip('me')
 myLocation = g.city     # lấy tên thành phố
+# print(g.latlng)
+# [21.0245, 105.8412]
 
 # loc = Nominatim(user_agent="GetLoc")
 # myLocation = loc.geocode("Hà Nội")
@@ -27,18 +31,18 @@ def theWeatherNow():
     humid = data['main']['humidity']
     status = data['weather'][0]['description']
     visibility = data['visibility']
-    windSpeed = data['wind']['speed']
-    text = f'Nhiệt độ: {temp} độ C \n Độ ẩm: {humid}% \n Tầm nhìn xa: {visibility}m \n Tốc độ gió: {windSpeed}m/s'
+    place = data['name']
+    text = f'{status} \n Nhiệt độ: {temp} độ C \n Độ ẩm: {humid}% \n Tầm nhìn xa: {visibility}m'
     while True:
         t = ToastNotifier()
-        t.show_toast(f"Thời tiết của {myLocation} hôm nay:",text,duration = 5)
+        t.show_toast(f"Thời tiết của {place} hôm nay:",text,duration = 5)
         break
 def show_weather_here():
     show_weather = threading.Thread(target = theWeatherNow)
     show_weather.start()
 
 def resultOfSearch(location):
-    x = requests.get(f'https://api.openweathermap.org/data/2.5/weather?q={location}&appid=a7c7bb6f3e9b61aee6966b09d3e30214')
+    x = requests.get(f'https://api.openweathermap.org/data/2.5/weather?q={location}&lang=vi&appid=a7c7bb6f3e9b61aee6966b09d3e30214')
     data = json.loads(x.text)
     # print(data)
     return data
@@ -57,12 +61,11 @@ def weatherOfCity(city):
         humid = data['main']['humidity']
         status = data['weather'][0]['description']
         visibility = data['visibility']
-        windSpeed = data['wind']['speed']
         lb1 = Label(frame4,text=f'Thành phố {city} ', font="Time 12 bold")
+        lb6 = Label(frame4,text=f'{status}', font="Time 12")
         lb3 = Label(frame4,text=f'Nhiệt độ {"%.2f"%temp} độ C', font="Time 12")
         lb4 = Label(frame4,text=f'Độ ẩm {humid}%', font="Time 12")
         lb5 = Label(frame4,text=f'Tầm nhìn xa {visibility}m/s', font="Time 12")
-        lb6 = Label(frame4,text=f'Tốc độ gió {windSpeed}m/s', font="Time 12")
         lb1.pack()
         lb3.pack()
         lb4.pack()
@@ -90,6 +93,7 @@ def searchFunction():
 
 def bot_run():
     botAI.run()
+    # print()
 
 screenWidth = win.winfo_screenwidth()
 screenHeight = win.winfo_screenheight()
@@ -108,7 +112,7 @@ lb3 = Label(frame2, text="Xem thời tiết tỉnh thành khác", font="Times 14
 lb4 = Label(frame2, text="Bot AI", font="Times 14")
 btn1 = Button(frame2, text="Chọn", command=show_weather_here)
 btn2 = Button(frame2, text="Nhập", command=searchFunction)
-btn3 = Button(frame2, text="Nhập", command=bot_run)
+btn3 = Button(frame2, text="run", command=bot_run)
 lb1.pack()
 lb2.grid(row=0, column=0,sticky=W)
 lb3.grid(row=1, column=0,sticky=W)
