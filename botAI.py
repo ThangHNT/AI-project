@@ -218,4 +218,4 @@ def run():
                 getWeatherOtherDay(city,2,text)
             else: getCurrentWeather(city)
         
-run()
+# run()
