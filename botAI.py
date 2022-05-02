@@ -170,6 +170,36 @@ def weatherOfTheFollowingDay(location,number):
         speak(status)
         time.sleep(2)
         
+def weatherHourly(location,number):
+    soup = visitWebPage(location)
+    weatherDaily = soup.find_all('div', attrs = {'class': 'carousel-inner row w-100 mx-auto'})
+    hourly = weatherDaily[0]
+    item = hourly.find_all('div',{'class':'location-wheather'})
+    status = item[0].find('p',{'class':'mb-0'})
+    gethour = item[0].find('span').text.strip()
+    temp = item[0].find('div',{'class':'card-city-footer'})
+    tempAvg = temp.find('p',{'title':'Nhiệt độ trung bình'}).text.strip()
+    l = int(len(item)/2 + 1)
+    for x in range(0,l):
+        gethour = item[x].find('span').text.strip()
+        hour = 0
+        now = datetime.datetime.now().hour
+        if(gethour == 'Hiện tại') : hour = now
+        else: hour = int(gethour.replace(':00',''))
+        if now + number > 23: 
+            speak('Có phải bạn muốn xem thời tiết ngày mai?')
+            time.sleep(3)
+        else:
+            if now + number == hour:
+                status = item[number].find('p',{'class':'mb-0'}).text.strip()
+                temp = item[number].find('div',{'class':'card-city-footer'})
+                tempAvg = temp.find('p',{'title':'Nhiệt độ trung bình'}).text.strip()
+                speak(f'{location} trong {number} giờ tới')
+                time.sleep(3)
+                speak(f'{status}')
+                time.sleep(3)
+                speak(f'Nhiệt độ trung bình: {tempAvg}')
+
 
 def run():
     while True:
@@ -186,7 +216,7 @@ def run():
             speak('bạn hãy đưa ra câu hỏi về thời tiết')
             time.sleep(2)
         else : 
-            checkNumber = x = re.findall("[0-9]", text)
+            checkNumber = re.findall("[0-9]", text)
             if 'có mưa' in text and 'ngày mai' in text :
                 checkRainOrSunny(city,1,'mưa')
             elif 'có mưa' in text and 'ngày kia' in text :
@@ -201,7 +231,7 @@ def run():
                 checkRainOrSunny(city,checkNumber[0],'nắng')
             elif 'ngày tới' in text and len(checkNumber) > 0 :
                 weatherOfTheFollowingDay(city,checkNumber[0])
-            elif 'ngày mai' in text :
+            elif 'ngày mai' in text or 'ngày hôm sau' in text :
                 getWeatherOtherDay(city,1,text)
             elif 'ngày kia' in text :
                 getWeatherOtherDay(city,2,text)
