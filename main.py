@@ -19,7 +19,6 @@ g = geocoder.ip('me')
 myLocation = g.city     # lấy tên thành phố
 # print(g.latlng)
 # [21.0245, 105.8412]
-
 # loc = Nominatim(user_agent="GetLoc")
 # myLocation = loc.geocode("Hà Nội")
 # print((myLocation.address))

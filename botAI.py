@@ -11,7 +11,7 @@ import threading
 from tkinter import *
 # import main
 import unidecode
-import webbrowser as wb
+import webbrowser 
 import datetime
 import string_comparison_algorithm as sca
 from bs4 import BeautifulSoup
@@ -77,6 +77,18 @@ def visitWebPage(location):
     soup = BeautifulSoup(page, 'html.parser')
     return soup
 
+def open_website(location):
+    city = remove_accent(location).replace(' ','-')
+    url = 'https://thoitiet.vn/' + str(city)
+    speak(f'bạn có muốn biết thêm thông tin chi tiết từ website?')
+    time.sleep(3)
+    confirm = get_text()
+    if 'có' in confirm:
+        webbrowser.open(url)
+        time.sleep(5)
+        return False
+    return True
+
 def getCurrentWeather(location):  # xem thời tiết hiện tại
     soup = visitWebPage(location)
     status = soup.find('p',{'class': 'overview-caption-item-detail'}).text.strip()
@@ -88,7 +100,6 @@ def getCurrentWeather(location):  # xem thời tiết hiện tại
     tempRange = tempRangeHtml.replace('/','-')
     tempRange += 'C'
     humid = ds[1].find('span',{'class': 'text-white op-8 fw-bold'}).text.strip()
-    visibility = ds[2].find('span',{'class': 'text-white op-8 fw-bold'}).text.strip()
     UV_index = ds[5].find('span',{'class': 'text-white op-8 fw-bold'}).text.strip()
     speak(f'{location} hiện tại {status}')
     time.sleep(2)
@@ -98,10 +109,9 @@ def getCurrentWeather(location):  # xem thời tiết hiện tại
     time.sleep(4)
     speak(f'Độ ẩm {humid}')
     time.sleep(3)
-    speak(f'Tầm nhìn xa {visibility}')
-    time.sleep(3)
     speak(f'chỉ số tia UV {UV_index}')
     time.sleep(3)
+
 
 def getWeatherOtherDay(location,count,text): # xem thời tiết vào 1 ngày nào đó
     soup = visitWebPage(location)
@@ -235,6 +245,8 @@ def checkRainSunnyToday(location,number,mess):
         speak(f'trong {number} giờ tới có mưa')
         time.sleep(3)
 
+
+
 def run():
     while True:
         speak('Tôi có thể giúp gì cho bạn')
@@ -247,8 +259,8 @@ def run():
             time.sleep(3)
             break
         elif(city == '') : 
-            speak('bạn hãy đưa ra câu hỏi về thời tiết')
-            time.sleep(2)
+            speak('bạn hãy đưa ra câu hỏi về thời tiết của tỉnh thành phố nào đó')
+            time.sleep(5)
         else : 
             checkNumber = re.findall("[0-9]", text)
             if 'có mưa' in text and 'ngày mai' in text :
@@ -276,5 +288,7 @@ def run():
             elif 'giờ tới' in text or 'giờ sau' in text:
                 weatherHourly(city,checkNumber[0])
             else: getCurrentWeather(city)
+            o = open_website(city)
+            if o == False: break
         
 # run()
