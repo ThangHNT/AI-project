@@ -155,14 +155,15 @@ for x in range(0,l):
     now = datetime.datetime.now().hour
     if(gethour == 'Hiện tại') : hour = now
     else: hour = int(gethour.replace(':00',''))
-    # print(hour)
+    if hour == 0: break
+    print(hour)
     if now + t > 23: print('ban muon xem thoi tiet ngay mai')
     else:
         if now + t == hour:
             status = k[t].find('p',{'class':'mb-0'}).text.strip()
             temp = k[t].find('div',{'class':'card-city-footer'})
             tempAvg = temp.find('p',{'title':'Nhiệt độ trung bình'}).text.strip()
-            print(f'{status} {tempAvg}')
+            # print(f'{status} {tempAvg}')
     
 
 # print(tempAvg)

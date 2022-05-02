@@ -56,7 +56,7 @@ def get_text():
 
 
 def getCity(y):
-    if 'thời tiết' not in y and 'nắng' not in y and 'mưa' not in y : return ''
+    if 'thời tiết' not in y and 'nắng' not in y and 'mưa' not in y  and 'nhiệt độ' not in y: return ''
     else: 
         listCity = []
         with open('cities.txt','r', encoding ='UTF-8') as file_object:
@@ -172,13 +172,10 @@ def weatherOfTheFollowingDay(location,number):
         
 def weatherHourly(location,number):
     soup = visitWebPage(location)
+    number = int(number)
     weatherDaily = soup.find_all('div', attrs = {'class': 'carousel-inner row w-100 mx-auto'})
     hourly = weatherDaily[0]
     item = hourly.find_all('div',{'class':'location-wheather'})
-    status = item[0].find('p',{'class':'mb-0'})
-    gethour = item[0].find('span').text.strip()
-    temp = item[0].find('div',{'class':'card-city-footer'})
-    tempAvg = temp.find('p',{'title':'Nhiệt độ trung bình'}).text.strip()
     l = int(len(item)/2 + 1)
     for x in range(0,l):
         gethour = item[x].find('span').text.strip()
@@ -186,6 +183,7 @@ def weatherHourly(location,number):
         now = datetime.datetime.now().hour
         if(gethour == 'Hiện tại') : hour = now
         else: hour = int(gethour.replace(':00',''))
+        if hour == 0: break
         if now + number > 23: 
             speak('Có phải bạn muốn xem thời tiết ngày mai?')
             time.sleep(3)
@@ -199,7 +197,43 @@ def weatherHourly(location,number):
                 speak(f'{status}')
                 time.sleep(3)
                 speak(f'Nhiệt độ trung bình: {tempAvg}')
+                time.sleep(3)
 
+def checkRainSunnyToday(location,number,mess):
+    soup = visitWebPage(location)
+    number = int(number)
+    weatherDaily = soup.find_all('div', attrs = {'class': 'carousel-inner row w-100 mx-auto'})
+    hourly = weatherDaily[0]
+    item = hourly.find_all('div',{'class':'location-wheather'})
+    l = int(len(item)/2 + 1)
+    for x in range(0,l):
+        gethour = item[x].find('span').text.strip()
+        hour = 0
+        now = datetime.datetime.now().hour
+        if(gethour == 'Hiện tại') : hour = now
+        else: hour = int(gethour.replace(':00',''))
+        if hour == 0: break
+        status = item[x].find('p',{'class':'mb-0'}).text.strip()
+        checkRain = False
+        checkSunny = False
+        if mess == 'mưa':
+            if mess in status:
+                speak(f'trong {number} giờ tới có mưa')
+                time.sleep(3)
+                checkRain = True
+                break
+        else :
+            if 'mưa' not in status:
+                speak(f'trong {number} giờ tới có nắng')
+                time.sleep(3)
+                checkSunny = True
+                break
+    if checkRain == False and mess == 'mưa': 
+        speak(f'trong {number} giờ tới không có mưa')
+        time.sleep(3)
+    elif checkSunny == False and mess == 'nắng':
+        speak(f'trong {number} giờ tới có mưa')
+        time.sleep(3)
 
 def run():
     while True:
@@ -235,6 +269,12 @@ def run():
                 getWeatherOtherDay(city,1,text)
             elif 'ngày kia' in text :
                 getWeatherOtherDay(city,2,text)
+            elif 'giờ tới' in text and 'có mưa' in text:
+                checkRainSunnyToday(city,checkNumber[0],'mưa')
+            elif 'giờ tới' in text and 'có nắng' in text:
+                checkRainSunnyToday(city,checkNumber[0],'nắng')
+            elif 'giờ tới' in text or 'giờ sau' in text:
+                weatherHourly(city,checkNumber[0])
             else: getCurrentWeather(city)
         
-# run()
+run()
