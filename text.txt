@@ -1,0 +1,1 @@
+urllib là một mô-đun của Python có thể dùng để mở các URL. Nó định nghĩa các hàm và lớp giúp thao tác với URL.

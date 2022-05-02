@@ -32,7 +32,7 @@ def theWeatherNow():
     status = data['weather'][0]['description']
     visibility = data['visibility']
     place = data['name']
-    text = f'{status} \n Nhiệt độ: {temp} độ C \n Độ ẩm: {humid}% \n Tầm nhìn xa: {visibility}m'
+    text = f'{status} \n Nhiệt độ: {"%.2f"%temp} độ C \n Độ ẩm: {humid}% \n Tầm nhìn xa: {visibility}m'
     while True:
         t = ToastNotifier()
         t.show_toast(f"Thời tiết của {place} hôm nay:",text,duration = 5)
@@ -92,8 +92,9 @@ def searchFunction():
     frame4.pack()
 
 def bot_run():
-    botAI.run()
-    # print()
+    k = threading.Thread(target = botAI.run())
+    k.start()
+    
 
 screenWidth = win.winfo_screenwidth()
 screenHeight = win.winfo_screenheight()
@@ -133,10 +134,6 @@ img = ImageTk.PhotoImage(resizeImg)
 lb5 = Label(frame5,image=img)
 lb5.pack()
 
-# -------------------------------------------------------------------------------------------------------------------
-# myclient = pymongo.MongoClient("mongodb://localhost:27017/")
-# mydb = myclient["AI"]
-# mycollection = mydb["cities"]
 
 show_weather_here()
 win.mainloop()

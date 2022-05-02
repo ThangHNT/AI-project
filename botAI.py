@@ -127,41 +127,31 @@ def checkRainOrSunny(location,number,type): # kiểm tra trog n ngày tới có 
     number = int(number)
     weatherDaily = soup.find_all('div', attrs = {'class': 'carousel-inner row w-100 mx-auto'})
     eachDay = weatherDaily[1].find_all('div', {'class':'location-wheather'})
-    if number == 1:
-        status = eachDay[1].find('p',{'class':'mb-0'}).text.strip().lower()
-        if 'mưa' in status : speak('ngày mai có mưa')
-        else : speak('ngày mai có nắng')
+    
+    for i in range(1,number+1):
+        status = eachDay[i].find('p',{'class':'mb-0'}).text.strip().lower()
+        date = eachDay[i].find('span').text.strip()
+        date = date.replace('T', 'thứ ')
+        if 'CN' in date: date = date.replace('CN', 'chủ nhật')
+        if 'mưa' in status: rain.append(date)
+        else : sunny.append(date)
+    if (len(rain) == 0 and type == 'mưa'):
+        speak(f'trong {number} ngày tới không có {type}')
         time.sleep(3)
-    if number == 2:
-        status = eachDay[2].find('p',{'class':'mb-0'}).text.strip().lower()
-        if 'mưa' in status : speak('ngày kia có mưa')
-        else : speak('ngày kia có nắng')
+    elif (len(sunny) == 0 and type == 'nắng'):
+        speak(f'trong {number} ngày tới không có {type}')
         time.sleep(3)
     else:
-        for i in range(1,number+1):
-            status = eachDay[i].find('p',{'class':'mb-0'}).text.strip().lower()
-            date = eachDay[i].find('span').text.strip()
-            date = date.replace('T', 'thứ ')
-            if 'CN' in date: date = date.replace('CN', 'chủ nhật')
-            if 'mưa' in status: rain.append(date)
-            else : sunny.append(date)
-        if (len(rain) == 0 and type == 'mưa'):
-            speak(f'trong {number} ngày tới không có {type}')
-            time.sleep(3)
-        elif (len(sunny) == 0 and type == 'nắng'):
-            speak(f'trong {number} ngày tới không có {type}')
-            time.sleep(3)
-        else:
-            speak(f'những ngày {type} trong {number} ngày tới')
-            time.sleep(3)
-            if type == 'mưa':
-                for k in rain:
-                    speak(k)
-                    time.sleep(2)
-            else: 
-                for k in sunny:
-                    speak(k)
-                    time.sleep(2)
+        speak(f'những ngày {type} trong {number} ngày tới')
+        time.sleep(3)
+        if type == 'mưa':
+            for k in rain:
+                speak(k)
+                time.sleep(2)
+        else: 
+            for k in sunny:
+                speak(k)
+                time.sleep(2)
 
 def weatherOfTheFollowingDay(location,number):
     soup = visitWebPage(location)
@@ -197,7 +187,6 @@ def run():
             time.sleep(2)
         else : 
             checkNumber = x = re.findall("[0-9]", text)
-            print(checkNumber)
             if 'có mưa' in text and 'ngày mai' in text :
                 checkRainOrSunny(city,1,'mưa')
             elif 'có mưa' in text and 'ngày kia' in text :

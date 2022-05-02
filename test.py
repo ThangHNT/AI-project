@@ -4,6 +4,9 @@ import json
 import pymongo
 import webbrowser as wb
 import re
+from bs4 import BeautifulSoup
+import urllib.request
+
 # g = geocoder.ip('me')
 # print(g.state)
 # print(g.json)
@@ -122,8 +125,7 @@ def getCity(y):
     return ''
 # getCity(y)
 
-from bs4 import BeautifulSoup
-import urllib.request
+
 url =  'https://thoitiet.vn/nam-dinh' 
 page = urllib.request.urlopen(url)
 soup = BeautifulSoup(page, 'html.parser')
@@ -134,7 +136,13 @@ status = eachDay[1].find('p',{'class':'mb-0'}).text.strip()
 tempMin = eachDay[1].find('p',{'title':'Thấp nhất'}).text.strip()
 tempMax = eachDay[1].find('p',{'title':'Cao nhất'}).text.strip()
 date = eachDay[1].find('span').text.strip()
-# print(date)
+
+
+img = soup.find('div', {'class': 'chart-container bg-white'})
+canvas = img.find_all('canvas', {'id':'rainHour'})
+print(canvas[0])
+
+
 
 # curTemp = soup.find('span',{'class': 'current-temperature'}).text.strip()
 # print(curTemp)
@@ -145,8 +153,8 @@ date = eachDay[1].find('span').text.strip()
 # ds = weatherDetail.find_all('div',{'class': 'd-flex ml-auto align-items-center'})
 # weatherDetailItem = ds[2].find('span',{'class': 'text-white op-8 fw-bold'}).text.strip()
 
-txt = 'thời tiết hà nội trong 7 ngày tới'
-x = re.findall("[0-9]", txt)
-print(x)
+# txt = 'thời tiết hà nội trong 7 ngày tới'
+# x = re.findall("[0-9]", txt)
+# print(x)
 
 
