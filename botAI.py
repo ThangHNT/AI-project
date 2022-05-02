@@ -277,4 +277,4 @@ def run():
                 weatherHourly(city,checkNumber[0])
             else: getCurrentWeather(city)
         
-run()
+# run()
