@@ -52,7 +52,7 @@ def weatherOfCity(city):
     for widgets in frame4.winfo_children():
         widgets.destroy()
     if(data['cod'] == '404'): 
-        lb1 = Label(frame4,text="Vui lòng nhập đúng tên tỉnh thành phố.")
+        lb1 = Label(frame4,text="Vui lòng nhập đúng tên tỉnh thành phố.",font="Time 13 ")
         lb1.pack()
     else:  
         temp = data['main']['temp']
@@ -60,16 +60,17 @@ def weatherOfCity(city):
         humid = data['main']['humidity']
         status = data['weather'][0]['description']
         visibility = data['visibility']
+        city = city.title()
         lb1 = Label(frame4,text=f'Thành phố {city} ', font="Time 12 bold")
-        lb6 = Label(frame4,text=f'{status}', font="Time 12")
         lb3 = Label(frame4,text=f'Nhiệt độ {"%.2f"%temp} độ C', font="Time 12")
         lb4 = Label(frame4,text=f'Độ ẩm {humid}%', font="Time 12")
         lb5 = Label(frame4,text=f'Tầm nhìn xa {visibility}m/s', font="Time 12")
+        lb6 = Label(frame4,text=f'{status}', font="Time 12")
         lb1.pack()
+        lb6.pack()
         lb3.pack()
         lb4.pack()
         lb5.pack()
-        lb6.pack()
     
 def closeSearchFunction():
     for widgets in frame4.winfo_children():
