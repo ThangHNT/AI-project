@@ -1,3 +1,5 @@
+# Thuật toán tìm kiếm Knuth Morris Pratt
+
 def preKMP(x):
     kmpNext = [0]*(len(x) +1)
     i = 0

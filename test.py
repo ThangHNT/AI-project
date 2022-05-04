@@ -138,31 +138,31 @@ weatherDaily = soup.find_all('div', attrs = {'class': 'carousel-inner row w-100 
 # tempMax = eachDay[1].find('p',{'title':'Cao nhất'}).text.strip()
 # date = eachDay[1].find('span').text.strip()
 
-t = int(input("thoi tiet sau: "))
+# t = int(input("thoi tiet sau: "))
 
-hourly = weatherDaily[0]
-k = hourly.find_all('div',{'class':'location-wheather'})
-status = k[0].find('p',{'class':'mb-0'})
-gethour = k[0].find('span').text.strip()
-temp = k[0].find('div',{'class':'card-city-footer'})
-tempAvg = temp.find('p',{'title':'Nhiệt độ trung bình'}).text.strip()
+# hourly = weatherDaily[0]
+# k = hourly.find_all('div',{'class':'location-wheather'})
+# status = k[0].find('p',{'class':'mb-0'})
+# gethour = k[0].find('span').text.strip()
+# temp = k[0].find('div',{'class':'card-city-footer'})
+# tempAvg = temp.find('p',{'title':'Nhiệt độ trung bình'}).text.strip()
 
-l = int(len(k)/2 + 1)
+# l = int(len(k)/2 + 1)
 
-for x in range(0,l):
-    gethour = k[x].find('span').text.strip()
-    hour = 0
-    now = datetime.datetime.now().hour
-    if(gethour == 'Hiện tại') : hour = now
-    else: hour = int(gethour.replace(':00',''))
-    if hour == 0: break
-    print(hour)
-    if now + t > 23: print('ban muon xem thoi tiet ngay mai')
-    else:
-        if now + t == hour:
-            status = k[t].find('p',{'class':'mb-0'}).text.strip()
-            temp = k[t].find('div',{'class':'card-city-footer'})
-            tempAvg = temp.find('p',{'title':'Nhiệt độ trung bình'}).text.strip()
+# for x in range(0,l):
+#     gethour = k[x].find('span').text.strip()
+#     hour = 0
+#     now = datetime.datetime.now().hour
+#     if(gethour == 'Hiện tại') : hour = now
+#     else: hour = int(gethour.replace(':00',''))
+#     if hour == 0: break
+#     print(hour)
+#     if now + t > 23: print('ban muon xem thoi tiet ngay mai')
+#     else:
+#         if now + t == hour:
+#             status = k[t].find('p',{'class':'mb-0'}).text.strip()
+#             temp = k[t].find('div',{'class':'card-city-footer'})
+#             tempAvg = temp.find('p',{'title':'Nhiệt độ trung bình'}).text.strip()
             # print(f'{status} {tempAvg}')
     
 
