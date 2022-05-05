@@ -138,8 +138,10 @@ weatherDaily = soup.find_all('div', attrs = {'class': 'carousel-inner row w-100 
 # tempMax = eachDay[1].find('p',{'title':'Cao nhất'}).text.strip()
 # date = eachDay[1].find('span').text.strip()
 
-# t = int(input("thoi tiet sau: "))
+k = soup.find('h2',{'class':'air-title'}).text.strip()
+print(k)
 
+# t = int(input("thoi tiet sau: "))
 # hourly = weatherDaily[0]
 # k = hourly.find_all('div',{'class':'location-wheather'})
 # status = k[0].find('p',{'class':'mb-0'})
